@@ -1,8 +1,9 @@
 'use strict'
-var Caller = function (config, socket) {
+var Caller = function (config, socket, onopencallback) {
     var self = this;
     this.connection;
     this.socket = socket;
+    this.onopencallback = onopencallback || function () {};
 
     var log = function (e, obj) {
         console.log(new Date(), "caller", e, obj);
@@ -12,26 +13,22 @@ var Caller = function (config, socket) {
     }
     var onlocalicecandidate = function (e) {
         if (e.candidate) {
-            self.socket.sendIceCandidate(e);
+            self.socket.sendIceCandidate(e.candidate);
         }
     }
     var onremoteicecandidate = function (e) {
-        if (e.candidate) {
-            console.log(e.candidate);
-            var candidate = new RTCIceCandidate(e.candidate);
-            self.connection.addIceCandidate(candidate);
-        }
+        var candidate = new RTCIceCandidate(e);
+        self.connection.addIceCandidate(candidate);
     }
     var onopen = function (e) {
+        self.channel = e.target;
         var channel = e.target;
         log("session opened", channel);
         channel.onmessage = self.onmessage;
         self.sendMessage = function (message) {
             channel.send(message);
-        }    
-    }
-    var onconnecting = function () {
-        log("connecting");
+        }
+        self.onopencallback();
     }
     var onanswer = function (e) {
         var answer = new RTCSessionDescription(e);

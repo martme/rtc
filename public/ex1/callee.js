@@ -12,25 +12,21 @@ var Callee = function (config, socket) {
     }
     var onlocalicecandidate = function (e) {   
         if (e.candidate) {
-            self.socket.sendIceCandidate(e);
+            self.socket.sendIceCandidate(e.candidate);
         }    
     }
     var onremoteicecandidate = function (e) {
-        if (e.candidate) {
-            var candidate = new RTCIceCandidate(e.candidate);
-            self.connection.addIceCandidate(candidate);
-        }
+        var candidate = new RTCIceCandidate(e);
+        self.connection.addIceCandidate(candidate);
     }
     var onopen = function (e) {
+        self.channel = e.channel;
         var channel = e.channel;
         log("session opened", channel);
         channel.onmessage = self.onmessage;
         self.sendMessage = function (message) {
             channel.send(message);
-        }   
-    }
-    var onconnecting = function () {
-        log("connecting");
+        }
     }
     var onoffer = function(e) {
         self.connection = new RTCPeerConnection(config.servers, {});
