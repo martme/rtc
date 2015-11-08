@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Caller</title>
+    <link rel="stylesheet" href="/common/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+</head>
+<body class="container-fluid">
+    <div class="col-xs-6 vh-100">
+        <ul id="caller-messages" class="list-unstyled messages"></ul>
+        <div class="pull-down">
+            <div class="input-group">
+                <input id="message-input-caller" type="text" class="form-control" placeholder="Write a message as Alice...">
+                <span class="input-group-btn">
+                    <button id="send-btn-caller" class="btn btn-default" type="button">Go!</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-6 vh-100">
+        <ul id="callee-messages" class="list-unstyled messages"></ul>
+        <div class="pull-down">
+            <div class="input-group">
+                <input id="message-input-callee" type="text" class="form-control" placeholder="Write a message as Bob...">
+                <span class="input-group-btn">
+                    <button id="send-btn-callee" class="btn btn-default" type="button">Go!</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/common/adapter.js"></script>
+    <script src="/common/config.js"></script>
+    <script src="callee.js"></script>
+    <script src="caller.js"></script>
+
+    <script>
+        var Socket = function (peer) {
+            this.sendIceCandidate = function (e) {
+                peer.addIceCandidate(e);
+            }
+            this.sendOffer = function (e) {
+                peer.onoffer(e);
+            }
+            this.sendAnswer = function (e) {
+                peer.onanswer(e);
+            }
+        };
+
+        var caller = new Caller(Config);
+        var callee = new Callee(Config);
+
+        caller.onmessage = function (message) {
+            onmessage(message, "caller");
+        };
+        callee.onmessage = function (message) {
+            onmessage(message, "callee")
+        };
+
+        caller.socket = new Socket(callee);
+        callee.socket = new Socket(caller);
+        caller.connect();
+
+
+        function getRecievedMessageElement(text) {
+            var li = document.createElement("li");
+            li.classList.add("message-received");
+            li.appendChild(document.createTextNode(text));
+            return li;
+        }
+        function getSentMessageElement(text) {
+            var li = document.createElement("li");
+            li.classList.add("message-sent");
+            li.appendChild(document.createTextNode(text));
+            return li;
+        }
+        function onmessage(message, receiver) {
+            var messageElement = getRecievedMessageElement(message.data);
+            document.getElementById(receiver + "-messages").appendChild(messageElement);
+            console.log("[" + receiver + "]", message.data);
+        }
+        function sendmessage(sender) {
+            var input = document.getElementById("message-input-" + sender);
+            var message = input.value;
+            input.value = "";
+
+            if (sender === "caller") caller.sendMessage(message);
+            else if (sender === "callee") callee.sendMessage(message);
+
+            var messageElement = getSentMessageElement(message);
+            document.getElementById(sender + "-messages").appendChild(messageElement);
+        }
+        document.getElementById("send-btn-caller").onclick = function () {  
+            sendmessage("caller");
+        }
+        document.getElementById("send-btn-callee").onclick = function () {
+            sendmessage("callee");
+        }
+    </script>
+</body>
+</html>
