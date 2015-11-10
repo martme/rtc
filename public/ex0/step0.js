@@ -14,9 +14,12 @@ var bob = {};
 var errorFn = function (error) {
     console.error(error)
 };
+var rtcChannelEstablished = function () {
+    console.log("Connection established")
+};
 
-alice.peerConnection = new RTCPeerConnection(servers, {});
-alice.dataChannel = alice.peerConnection.createDataChannel("unique id", {});
+alice.peerConnection = new RTCPeerConnection(servers);
+alice.dataChannel = alice.peerConnection.createDataChannel("myDataChannel");
 
 bob.peerConnection = new RTCPeerConnection(servers, {});
 
@@ -46,6 +49,7 @@ bob.peerConnection.ondatachannel = function (e) {
     bob.dataChannel.onmessage = function (e) {
         console.log("[to:bob]\t", e.data);
     }
+    rtcChannelEstablished();
 }
 
 alice.peerConnection.createOffer(
@@ -62,3 +66,5 @@ alice.peerConnection.createOffer(
     },
     errorFn
 );
+
+
