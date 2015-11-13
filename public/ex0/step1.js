@@ -34,7 +34,6 @@ var rtcChannelEstablished = function () {
     console.log("Connection established in step1");
 
     alice.dataChannel.onmessage = function (e) {
-        console.log("hello world");
         if (Object.prototype.toString.call(e.data) === "[object ArrayBuffer]") {
             var buffer = new Uint8Array(e.data);
             console.log("[to:alice]", "[type:arrayBuffer]", toCharArray(buffer));

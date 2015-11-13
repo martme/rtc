@@ -3,102 +3,67 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Caller</title>
-    <link rel="stylesheet" href="/common/style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <title>index.html</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+    </style>
 </head>
-<body class="container-fluid">
-    <div class="col-xs-6 vh-100">
-        <ul id="caller-messages" class="list-unstyled messages"></ul>
-        <div class="pull-down">
-            <div class="input-group">
-                <input id="message-input-caller" type="text" class="form-control" placeholder="Write a message as Alice...">
-                <span class="input-group-btn">
-                    <button id="send-btn-caller" class="btn btn-default" type="button">Go!</button>
-                </span>
-            </div>
+<body>
+    <div id="std_io">
+        <div id="out">
+            <pre id="stdout"></pre>
+        </div>
+        <div id="in">
+            <span class="fa fa-terminal"></span>
+            <input id="stdin"
+                type="text"
+                autofocus="true"
+                onkeypress="return handle_key_press(event)">
         </div>
     </div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common/adapter.js"></script>
+<script src="terminal.js"></script>
+<script src="ex1.js"></script>
+<script>
 
-    <div class="col-xs-6 vh-100">
-        <ul id="callee-messages" class="list-unstyled messages"></ul>
-        <div class="pull-down">
-            <div class="input-group">
-                <input id="message-input-callee" type="text" class="form-control" placeholder="Write a message as Bob...">
-                <span class="input-group-btn">
-                    <button id="send-btn-callee" class="btn btn-default" type="button">Go!</button>
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <script src="/common/adapter.js"></script>
-    <script src="/common/config.js"></script>
-    <script src="callee.js"></script>
-    <script src="caller.js"></script>
-
-    <script>
-        var Socket = function (peer) {
-            this.sendIceCandidate = function (e) {
-                peer.addIceCandidate(e);
-            }
-            this.sendOffer = function (e) {
-                peer.onoffer(e);
-            }
-            this.sendAnswer = function (e) {
-                peer.onanswer(e);
-            }
-        };
-
-        var caller = new Caller(Config);
-        var callee = new Callee(Config);
-
-        caller.onmessage = function (message) {
-            onmessage(message, "caller");
-        };
-        callee.onmessage = function (message) {
-            onmessage(message, "callee")
-        };
-
-        caller.socket = new Socket(callee);
-        callee.socket = new Socket(caller);
-        caller.connect();
-
-
-        function getRecievedMessageElement(text) {
-            var li = document.createElement("li");
-            li.classList.add("message-received");
-            li.appendChild(document.createTextNode(text));
-            return li;
-        }
-        function getSentMessageElement(text) {
-            var li = document.createElement("li");
-            li.classList.add("message-sent");
-            li.appendChild(document.createTextNode(text));
-            return li;
-        }
-        function onmessage(message, receiver) {
-            var messageElement = getRecievedMessageElement(message.data);
-            document.getElementById(receiver + "-messages").appendChild(messageElement);
-            console.log("[" + receiver + "]", message.data);
-        }
-        function sendmessage(sender) {
-            var input = document.getElementById("message-input-" + sender);
-            var message = input.value;
-            input.value = "";
-
-            if (sender === "caller") caller.sendMessage(message);
-            else if (sender === "callee") callee.sendMessage(message);
-
-            var messageElement = getSentMessageElement(message);
-            document.getElementById(sender + "-messages").appendChild(messageElement);
-        }
-        document.getElementById("send-btn-caller").onclick = function () {  
-            sendmessage("caller");
-        }
-        document.getElementById("send-btn-callee").onclick = function () {
-            sendmessage("callee");
-        }
-    </script>
+var sendMessage = function (message) {}
+var handle_key_press = function (e) {
+    console.log(e.keyCode)
+    switch (e.keyCode) {
+    case 13: // ENTER
+        var input = stdin.read(); stdin.clear();
+        sendMessage(input);
+        return;
+    case 12: // CTRL+L
+        stdout.clear();
+        return;
+    }
+}
+var renderMessageReceived = function (e) {
+    var element = document.createElement("span");
+    container.appendChild(element);
+    matrixRender("> " + e.data, element);
+    stdout.println("");
+}
+var renderMessageSent = function (message) {
+    stdout.println(message);
+}
+var client = new ChatClient();
+client.onpeerconnection = function (e) {
+    //stdout.clear();
+    stdout.info("Connected")
+    sendMessage = function (message) {
+        console.log(message);
+        e.dataChannel.send(message);
+        renderMessageSent(message);
+    };
+    e.dataChannel.onmessage = function (e) {
+        renderMessageReceived(e);
+    }
+};
+</script>
 </body>
 </html>

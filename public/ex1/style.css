@@ -1,0 +1,74 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    background: black;
+    color: #29ff17;
+    font-family: monospace;
+    font-size: 1.2em;
+}
+
+.hidden {
+    display: none;
+}
+
+.list-inline {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.list-inline > li {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.text-bg {
+    background: #444;
+    padding: 0.2em;
+}
+
+#std_io {
+    width: 100%;
+    height: 100%;
+}
+#out {
+    height: calc(100% - 2em);
+    max-width: 100%;
+    font-family: monospace;
+    overflow-y: auto;
+    padding-left: 0.5em;
+
+}
+#out .error {
+    color: red;
+}
+
+#out .warning {
+    color: yellow;
+}
+
+#out .info {
+    color: #f9f9f9;
+}
+
+#in {
+    height: 1.0em;
+    max-width: 100%;
+    padding-left: 0.5em;
+    padding-top: 0.3em;
+}
+
+input, textarea {
+}
+
+#in > input {
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    background: black;
+    border: none;
+    width: calc(100% - 2em);
+    outline: none;
+    padding: 0;
+}
