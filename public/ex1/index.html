@@ -17,6 +17,7 @@
         </div>
         <div id="in">
             <span class="fa fa-terminal"></span>
+            <span id="username"></span>
             <input id="stdin"
                 type="text"
                 autofocus="true"
@@ -42,30 +43,29 @@ var handle_key_press = function (e) {
         return;
     }
 };
-var renderMessageReceived = function (e) {
-    var element = document.createElement("span");
-    container.appendChild(element);
-    matrixRender("> " + e.data, element);
-    stdout.println("");
+var renderMessageReceived = function (username, message) {
+    console.log(message);
+    stdout.matrixRender(username + ": ", message);
 };
-var renderMessageSent = function (message) {
-    stdout.println(message);
+var renderMessageSent = function (username, message) {
+    stdout.println(username + ": " + message);
 };
+
+stdout.loglevel = "info";
 var client = new ChatClient();
-client.log = function (message) {
-    stdout.info(message);
-};
 
 client.onpeerconnection = function (e) {
     sendMessage = function (message) {
         console.log(message);
         e.dataChannel.send(message);
-        renderMessageSent(message);
+        renderMessageSent(client.username, message);
     };
     e.dataChannel.onmessage = function (e) {
-        renderMessageReceived(e);
+        renderMessageReceived(client.peerUsername, e.data);
     }
 };
+
+document.querySelector("#username").textContent = client.username + "$";
 </script>
 </body>
 </html>

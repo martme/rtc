@@ -1,89 +1,73 @@
 var InputStream = (function (container) {
     var self = this;
     var container = container;
-    var history = [];
-    var history_offset = 0;
-
-
     this.read = function () {
         return container.value;
     }
-
     this.clear = function () {
         container.value = "";
-    }
-
-    this.add_to_history = function (cmd) {
-        history.push(cmd);
-        history_offset = history.length;
-    }
-
-    this.set_previous_from_history = function () {
-        if (history.length === 0) return;
-        history_offset = Math.max(0, history_offset-1);
-        container.value = history[history_offset];
-    }
-    this.set_next_from_history = function () {
-        if (history.length === 0) return;
-        history_offset = Math.min(history.length, history_offset+1);
-        if (history_offset === history.length) {
-            container.value = "";
-        } else {
-            container.value = history[history_offset];
-        }
-    }
-
-    this.history = function () {
-        return history;
     }
 });
 
 var OutputStream = (function (container) {
     var self = this;
     var container = container;
+    this.loglevel = 0;
+
+    this.setloglevel = function (level) {
+        if (level === "info") self.loglevel = 2;
+        else if (level === "warn") self.loglevel = 1;
+        else self.loglevel = 0;
+    }
 
     this.print = function (text) {
         var text = document.createTextNode(text);
         container.appendChild(text);
         self.scroll_down();
-        return text;
     }
-
-    this.printMatrix = function (text) {
-
-    }
-
 
     this.println = function (text) {
         var text = document.createTextNode(text + "\n");
         container.appendChild(text);
         self.scroll_down();
-        return text;
     }
 
-    this.info = function (text)
-    {
-        var text = document.createTextNode(text + "\n");
-        var span = document.createElement("span");
-        span.classList.add("info");
-        span.appendChild(text);
-        container.appendChild(span);
-        self.scroll_down();
-    }
-
-    this.err = function (text) {
+    this.error = function (text) {
+        var icon = document.createElement("span");
+        icon.classList.add("fa");
+        icon.classList.add("fa-exclamation-triangle");
         var text = document.createTextNode(text + "\n");
         var span = document.createElement("span");
         span.classList.add("error");
+        span.appendChild(icon);
         span.appendChild(text);
         container.appendChild(span);
         self.scroll_down();
     }
 
     this.warn = function (text) {
+        if (self.loglevel < 1) return;
+        var icon = document.createElement("span");
+        icon.classList.add("fa");
+        icon.classList.add("fa-exclamation-circle");
         var text = document.createTextNode(text + "\n");
         var span = document.createElement("span");
         span.classList.add("warning");
+        span.appendChild(icon);
+        span.appendChild(text);
+        container.appendChild(span);
+        self.scroll_down();
+    }
+    this.info = function (text)
+    {
+        if (self.loglevel < 2) return;
+        var icon = document.createElement("span");
+        icon.classList.add("fa");
+        icon.classList.add("fa-info-circle");
+        var text = document.createTextNode(text + "\n");
+        var span = document.createElement("span");
+        span.classList.add("info");
+        span.appendChild(icon);
         span.appendChild(text);
         container.appendChild(span);
         self.scroll_down();
@@ -94,37 +78,53 @@ var OutputStream = (function (container) {
     this.clear = function () {
         container.innerHTML = "";
     }
-});
 
 
-var matrixRender = function (text, element) {
-    var current = Array.apply(null, Array(text.length)).map(function () {
-        var charCode = 32 + parseInt(Math.random() *  (124 - 32));
-        return String.fromCharCode(charCode);
-    }).join("");
-    var target = text;
-    var iterations = 0;
-    var interval = setInterval(function () {
-        if (current === target) {
-            clearInterval(interval);
-        } else {
-            current = renderNext(current, target);
-            element.innerHTML = current;
-        }
-        if (++iterations > 124-32) {
-            current = target;
-            element.innerHTML = current;
-        }
-    }, 15);
-    function renderNext(current, target) {
-        return current.split("").map(function (c, idx) {
-            if (c === target[idx]) return c;
-            var charCode = (c.charCodeAt(0) + 1) % 123;
-            if (charCode <= 32) charCode = 32;
+
+    this.matrixRender = function (prefix, text) {
+        var icon = document.createElement("span");
+        icon.classList.add("fa");
+        icon.classList.add("fa-user");
+        var textElement = document.createTextNode(prefix);
+        var prefixElement = document.createElement("span");
+        prefixElement.appendChild(icon);
+        prefixElement.appendChild(textElement);
+        container.appendChild(prefixElement);
+
+        var element = document.createElement("span");
+        container.appendChild(element);
+        container.appendChild(document.createTextNode("\n"));
+        self.scroll_down();
+
+        var current = Array.apply(null, Array(text.length)).map(function () {
+            var charCode = 32 + parseInt(Math.random() *  (124 - 32));
             return String.fromCharCode(charCode);
         }).join("");
+        var target = text;
+        var iterations = 0;
+        var interval = setInterval(function () {
+            if (current === target) {
+                clearInterval(interval);
+            } else {
+                current = renderNext(current, target);
+                element.innerHTML = current;
+            }
+            if (++iterations > 124-32) {
+                current = target;
+                element.innerHTML = current;
+            }
+        }, 15);
+        function renderNext(current, target) {
+            return current.split("").map(function (c, idx) {
+                if (c === target[idx]) return c;
+                var charCode = (c.charCodeAt(0) + 1) % 123;
+                if (charCode <= 32) charCode = 32;
+                return String.fromCharCode(charCode);
+            }).join("");
+        }
     }
-}
+});
+
 
 
 var stdin = new InputStream(document.getElementById("stdin"));

@@ -44,6 +44,10 @@ body {
     color: red;
 }
 
+#out .fa {
+    padding-right: 0.5em;
+}
+
 #out .warning {
     color: yellow;
 }
@@ -57,6 +61,8 @@ body {
     max-width: 100%;
     padding-left: 0.5em;
     padding-top: 0.3em;
+
+    white-space:nowrap;
 }
 
 input, textarea {
@@ -68,7 +74,8 @@ input, textarea {
     font-family: inherit;
     background: black;
     border: none;
-    width: calc(100% - 2em);
+    width: 100%;
+    max-width: calc(100% - 2em);
     outline: none;
     padding: 0;
 }

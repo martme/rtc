@@ -15,34 +15,36 @@ var ChatClient = function (username) {
     var console = stdout || console;
     this.onpeerconnection = function () {};
 
-    var websocket = new function () {
+    var websocket = new (function (username) {
+        var username = username;
         var self = this;
         this.send = function (type, destination, payload) {}
         this.sendoffer = function (destination, payload) {
-            console.info("[jsep]\t sending offer");
+            console.info("sending offer to " + destination);
             self.send("offer", destination, payload);
         };
         this.sendanswer = function (destination, payload) {
-            console.info("[jsep]\t sending answer");
+            console.info("sending answer to " + destination);
             self.send("answer", destination, payload);
         };
         this.sendicecandidate = function (destination, payload) {
-            console.info("[jsep]\t sending icecandidate");
+            console.info("sending icecandidate to " + destination);
             self.send("icecandidate", destination, payload);
         };
-    };
+    })(this.username);
     var errorFn = function(e) {
         console.error(e);
     };
-    var connect = function (peerId) {
-        peerId = peerId || "caller bob";
+    var connect = function (destination) {
+        destination = destination || "unknown";
+        self.peerUsername = destination;
         self.peerConnection = new RTCPeerConnection(servers, {});
         self.dataChannel = self.peerConnection.createDataChannel("myDataChannel", {});
 
         self.peerConnection.onicecandidate = function (e) {
             if (!e.candidate) return;
             var candidate = new RTCIceCandidate(e.candidate);
-            websocket.sendicecandidate(peerId, e.candidate);
+            websocket.sendicecandidate(destination, e.candidate);
         };
         self.dataChannel.onopen = function (e) {
             self.onpeerconnection(self);
@@ -50,29 +52,37 @@ var ChatClient = function (username) {
         self.peerConnection.createOffer(
             function (offer) {
                 self.peerConnection.setLocalDescription(offer);
-                websocket.sendoffer(peerId, offer);
+                websocket.sendoffer(destination, offer);
             },
             errorFn
         );
     };
-    var handleanswer = function (answer, peerId) {
+    var handleicecandidate = function (icecandidate, source) {
+        console.info("received icecandidate from " + source);
+        self.peerConnection.addIceCandidate(icecandidate);
+    }
+    var handleanswer = function (answer, source) {
+        self.peerUsername = source;
+        console.info("received answer from " + source);
         self.peerConnection.setRemoteDescription(answer);
     };
-    var handleoffer = function (offer, peerId) {
-        var peerId = peerId || "callee alice"
+    var handleoffer = function (offer, source) {
+        console.info("received offer from " + source);
+        self.peerUsername = source;
+        var source = source;
         self.peerConnection = new RTCPeerConnection(servers, {});
         self.peerConnection.setRemoteDescription(offer);
         self.peerConnection.createAnswer(
             function (answer) {
                 self.peerConnection.setLocalDescription(answer);
-                websocket.sendanswer(peerId, answer);
+                websocket.sendanswer(source, answer);
             },
             errorFn
         );
         self.peerConnection.onicecandidate = function (e) {
             if (!e.candidate) return;
             var candidate = new RTCIceCandidate(e.candidate);
-            websocket.sendicecandidate(peerId, e.candidate);
+            websocket.sendicecandidate(source, e.candidate);
         };
         self.peerConnection.ondatachannel = function (e) {
             self.dataChannel = e.channel;
@@ -87,6 +97,7 @@ var ChatClient = function (username) {
                 var message = {
                     _type: type,
                     _destination: destination,
+                    _source: self.username,
                     _payload: payload
                 };
                 socket.emit("broadcast", JSON.stringify(message));
@@ -95,31 +106,27 @@ var ChatClient = function (username) {
         socket.on("joined", function (numerOfUsersOnline) {
             if (numerOfUsersOnline > 1) {
                 console.clear();
-                console.info("[jsep]\t " + numerOfUsersOnline + " users online. Connecting ...");
+                console.info( (numerOfUsersOnline-1) + " other user(s) online. Connecting ...");
                 connect();
             } else {
                 console.clear();
-                console.info("[jsep] \t Waiting for others to come online");
+                console.info("Waiting for others to come online");
             }
         });
         socket.on("broadcast", function (e) {
             var data = JSON.parse(e);
 
             if (data._type === "offer") {
-                console.clear();
-                console.info("[jsep]\t received offer");
                 var offer = new RTCSessionDescription(data._payload);
-                handleoffer(offer);
+                handleoffer(offer, data._source);
             }
             else if (data._type === "answer" && self.peerConnection) {
-                console.info("[jsep]\t received answer");
                 var answer = new RTCSessionDescription(data._payload);
-                handleanswer(answer);
+                handleanswer(answer, data._source);
             }
             else if (data._type === "icecandidate" && self.peerConnection) {
-                console.info("[jsep]\t received icecandidate");
                 var candidate = new RTCIceCandidate(data._payload);
-                self.peerConnection.addIceCandidate(candidate);
+                handleicecandidate(candidate, data._source);
             }
             else {
                 console.error("received uncaught broadcast", data);
