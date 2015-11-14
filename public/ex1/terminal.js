@@ -35,7 +35,7 @@ var OutputStream = (function (container) {
     this.error = function (text) {
         var icon = document.createElement("span");
         icon.classList.add("fa");
-        icon.classList.add("fa-exclamation-triangle");
+        icon.classList.add("fa-times-circle");
         var text = document.createTextNode(text + "\n");
         var span = document.createElement("span");
         span.classList.add("error");
@@ -49,7 +49,7 @@ var OutputStream = (function (container) {
         if (self.loglevel < 1) return;
         var icon = document.createElement("span");
         icon.classList.add("fa");
-        icon.classList.add("fa-exclamation-circle");
+        icon.classList.add("fa-exclamation-triangle");
         var text = document.createTextNode(text + "\n");
         var span = document.createElement("span");
         span.classList.add("warning");

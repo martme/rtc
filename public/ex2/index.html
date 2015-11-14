@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>index.html</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+    </style>
+</head>
+<body>
+    <div id="std_io">
+        <div id="out">
+            <pre id="stdout"></pre>
+        </div>
+        <div id="in">
+            <span class="fa fa-terminal"></span>
+            <span id="username"></span>
+            <input id="stdin"
+                type="text"
+                autofocus="true"
+                onkeypress="return handle_key_press(event)">
+        </div>
+    </div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common/adapter.js"></script>
+<script src="/ex1/terminal.js"></script>
+<script src="ex2.js"></script>
+<script>
+
+var sendMessage = function (message) {};
+var handle_key_press = function (e) {
+    switch (e.keyCode) {
+    case 13: // ENTER
+        var input = stdin.read(); stdin.clear();
+        sendMessage(input);
+        return;
+    case 12: // CTRL+L
+        stdout.clear();
+        return;
+    }
+};
+var renderMessageReceived = function (username, message) {
+    console.log(message);
+    stdout.matrixRender(username + ": ", message);
+};
+var renderMessageSent = function (username, message) {
+    stdout.println(username + ": " + message);
+};
+
+stdout.loglevel = "info";
+var client = new ChatClient();
+
+
+
+client.onpeerconnection = function (peer) {
+    sendMessage = function (message) {
+        var peers = Object.keys(client.peers).forEach(function (key) {
+            var peer = client.peers[key];
+            if (peer.dataChannel && peer.dataChannel.readyState === "open") {
+                peer.dataChannel.send(message);
+            }
+        });
+        renderMessageSent(client.username, message);
+    };
+    peer.dataChannel.onmessage = function (e) {
+        renderMessageReceived(peer.username, e.data);
+    }
+};
+
+document.querySelector("#username").textContent = client.username + "$";
+</script>
+</body>
+</html>
