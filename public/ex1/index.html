@@ -29,7 +29,7 @@
 <script src="ex1.js"></script>
 <script>
 
-var sendMessage = function (message) {}
+var sendMessage = function (message) {};
 var handle_key_press = function (e) {
     console.log(e.keyCode)
     switch (e.keyCode) {
@@ -41,20 +41,22 @@ var handle_key_press = function (e) {
         stdout.clear();
         return;
     }
-}
+};
 var renderMessageReceived = function (e) {
     var element = document.createElement("span");
     container.appendChild(element);
     matrixRender("> " + e.data, element);
     stdout.println("");
-}
+};
 var renderMessageSent = function (message) {
     stdout.println(message);
-}
+};
 var client = new ChatClient();
+client.log = function (message) {
+    stdout.info(message);
+};
+
 client.onpeerconnection = function (e) {
-    //stdout.clear();
-    stdout.info("Connected")
     sendMessage = function (message) {
         console.log(message);
         e.dataChannel.send(message);

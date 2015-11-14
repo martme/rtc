@@ -8,22 +8,26 @@ var servers = {
         {url:'stun:stun4.l.google.com:19302'}
     ]
 };
-var ChatClient = function (username, onpeerconnection) {
+var ChatClient = function (username) {
     var self = this;
     this.username = username || "user-" + parseInt(1000*Math.random());
 
-    this.onpeerconnection = onpeerconnection || function () {};
+    var console = stdout || console;
+    this.onpeerconnection = function () {};
 
     var websocket = new function () {
         var self = this;
         this.send = function (type, destination, payload) {}
         this.sendoffer = function (destination, payload) {
+            console.info("[jsep]\t sending offer");
             self.send("offer", destination, payload);
         };
         this.sendanswer = function (destination, payload) {
+            console.info("[jsep]\t sending answer");
             self.send("answer", destination, payload);
         };
         this.sendicecandidate = function (destination, payload) {
+            console.info("[jsep]\t sending icecandidate");
             self.send("icecandidate", destination, payload);
         };
     };
@@ -88,27 +92,32 @@ var ChatClient = function (username, onpeerconnection) {
                 socket.emit("broadcast", JSON.stringify(message));
             };
         });
-        socket.on("joined", function (count) {
-            console.log("count", count);
-            if (count > 1) {
-                console.log("connecting");
+        socket.on("joined", function (numerOfUsersOnline) {
+            if (numerOfUsersOnline > 1) {
+                console.clear();
+                console.info("[jsep]\t " + numerOfUsersOnline + " users online. Connecting ...");
                 connect();
             } else {
-                console.log("Waiting for someone to join the room.");
+                console.clear();
+                console.info("[jsep] \t Waiting for others to come online");
             }
         });
         socket.on("broadcast", function (e) {
             var data = JSON.parse(e);
 
             if (data._type === "offer") {
+                console.clear();
+                console.info("[jsep]\t received offer");
                 var offer = new RTCSessionDescription(data._payload);
                 handleoffer(offer);
             }
             else if (data._type === "answer" && self.peerConnection) {
+                console.info("[jsep]\t received answer");
                 var answer = new RTCSessionDescription(data._payload);
                 handleanswer(answer);
             }
             else if (data._type === "icecandidate" && self.peerConnection) {
+                console.info("[jsep]\t received icecandidate");
                 var candidate = new RTCIceCandidate(data._payload);
                 self.peerConnection.addIceCandidate(candidate);
             }
