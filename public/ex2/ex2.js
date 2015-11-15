@@ -117,12 +117,8 @@ var ChatClient = function (username) {
         // numberOfUsersOnline gives total number of connected clients
         socket.on("joined", function (numerOfUsersOnline) {
             if (numerOfUsersOnline > 1) {
-                // Connect to user (only works for two online users ...)
-                // console.clear();
-                //connectToPeer();
                 console.info((numerOfUsersOnline-1) + " other user(s) online.");
             } else {
-                //console.clear();
                 console.info("Waiting for others to come online");
             }
             socket.emit("hello", self.username);
@@ -140,6 +136,7 @@ var ChatClient = function (username) {
             var data = JSON.parse(e);
             // Ignore messages with other destination
             if (data._destination !== self.username) return;
+
             var peer = self.peers[data._source] || {};
             if (data._type === "offer") {
                 var offer = new RTCSessionDescription(data._payload);

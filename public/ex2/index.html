@@ -56,6 +56,12 @@ var client = new ChatClient();
 
 
 client.onpeerconnection = function (peer) {
+    peer.dataChannel.onclose = function (e) {
+        stdout.error("datachannel to " + peer.username + " was closed");
+    };
+    peer.dataChannel.onerror = function (e) {
+        stdout.warn("an error occured on datachannel to peer " + peer.username);
+    };
     sendMessage = function (message) {
         var peers = Object.keys(client.peers).forEach(function (key) {
             var peer = client.peers[key];
