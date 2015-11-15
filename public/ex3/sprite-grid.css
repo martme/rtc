@@ -1,0 +1,93 @@
+
+.sprite-grid {
+    position: relative;
+    width: 100vh;
+    height: 100vh;
+    background: #f9f9f9;
+}
+
+.sprite {
+    position: absolute;
+    height: calc(100% / 16);
+    width: calc(100% / 16);
+    border-radius: calc(100% / 2);
+}
+
+.sprite-black {
+    background-color: #555;
+}
+
+.sprite[data-direction="none"] {
+    animation: moveNone 150ms linear infinite;
+}
+@keyframes moveNone {
+    0% {}
+    100% {}
+}
+.sprite[data-direction="right"] {
+    animation: moveRight 150ms linear infinite;
+}
+@keyframes moveRight {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(100vh / 16)); }
+}
+
+.sprite[data-direction="left"] {
+    animation: moveLeft 150ms linear infinite;
+}
+@keyframes moveLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100vh / 16)); }
+}
+
+.sprite[data-direction="down"] {
+    animation: moveDown 150ms linear infinite;
+}
+@keyframes moveDown {
+    0% { transform: translateX(0); }
+    100% { transform: translateY(calc(100vh / 16)); }
+}
+
+.sprite[data-direction="up"] {
+    animation: moveUp 150ms linear infinite;
+}
+@keyframes moveUp {
+    0% { transform: translateX(0); }
+    100% { transform: translateY(calc(-100vh / 16)); }
+}
+
+div[data-position-x="0"] { left: calc(0 * 100% / 16); }
+div[data-position-x="1"] { left: calc(1 * 100% / 16); }
+div[data-position-x="2"] { left: calc(2 * 100% / 16); }
+div[data-position-x="3"] { left: calc(3 * 100% / 16); }
+div[data-position-x="4"] { left: calc(4 * 100% / 16); }
+div[data-position-x="5"] { left: calc(5 * 100% / 16); }
+div[data-position-x="6"] { left: calc(6 * 100% / 16); }
+div[data-position-x="7"] { left: calc(7 * 100% / 16); }
+div[data-position-x="8"] { left: calc(8 * 100% / 16); }
+div[data-position-x="9"] { left: calc(9 * 100% / 16); }
+div[data-position-x="10"] { left: calc(10 * 100% / 16); }
+div[data-position-x="11"] { left: calc(11 * 100% / 16); }
+div[data-position-x="12"] { left: calc(12 * 100% / 16); }
+div[data-position-x="13"] { left: calc(13 * 100% / 16); }
+div[data-position-x="14"] { left: calc(14 * 100% / 16); }
+div[data-position-x="15"] { left: calc(15 * 100% / 16); }
+div[data-position-x="16"] { left: calc(16 * 100% / 16); }
+
+div[data-position-y="0"] { top: calc(0 * 100% / 16); }
+div[data-position-y="1"] { top: calc(1 * 100% / 16); }
+div[data-position-y="2"] { top: calc(2 * 100% / 16); }
+div[data-position-y="3"] { top: calc(3 * 100% / 16); }
+div[data-position-y="4"] { top: calc(4 * 100% / 16); }
+div[data-position-y="5"] { top: calc(5 * 100% / 16); }
+div[data-position-y="6"] { top: calc(6 * 100% / 16); }
+div[data-position-y="7"] { top: calc(7 * 100% / 16); }
+div[data-position-y="8"] { top: calc(8 * 100% / 16); }
+div[data-position-y="9"] { top: calc(9 * 100% / 16); }
+div[data-position-y="10"] { top: calc(10 * 100% / 16); }
+div[data-position-y="11"] { top: calc(11 * 100% / 16); }
+div[data-position-y="12"] { top: calc(12 * 100% / 16); }
+div[data-position-y="13"] { top: calc(13 * 100% / 16); }
+div[data-position-y="14"] { top: calc(14 * 100% / 16); }
+div[data-position-y="15"] { top: calc(15 * 100% / 16); }
+div[data-position-y="16"] { top: calc(16 * 100% / 16); }

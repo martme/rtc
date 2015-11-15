@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake</title>
+    <link rel="stylesheet" href="sprite-grid.css" type="style/css">
+    <link rel="stylesheet" href="style.css" type="style/css">
+</head>
+
+<body>
+<h1>P2P Snake Game</h1>
+<p>Use arrow keys to move snake. Go to index page to watch snake move!</p>
+<script>
+    window.onkeydown = function (e) {
+        var code = e.keyCode ? e.keyCode : e.which;
+        if (code === 37) {
+            nextDirection = Grid.Direction.LEFT;
+        } else if (code === 38) {
+            nextDirection = Grid.Direction.UP;
+        } else if (code === 39) {
+            nextDirection = Grid.Direction.RIGHT;
+        } else if (code === 40) {
+            nextDirection = Grid.Direction.DOWN;
+        } else if (code === 32) { // SPACE
+            nextDirection = Grid.Direction.NONE;
+        }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake</title>
+    <link rel="stylesheet" href="sprite-grid.css" type="style/css">
+    <link rel="stylesheet" href="style.css" type="style/css">
+</head>
+
+<body>
+    <main id="grid" class="sprite-grid">
+    </main>
+
+<script src="sprite-grid.js"></script>
+<script>
+    var Grid = new SpriteGrid(document.getElementById("grid"));
+
+    var SnakePixel = function (x, y, clock) {
+        this.pixel = new Grid.Pixel(x, y, ["sprite-black"]);
+        this.clock = clock || 0;
+    }
+    var getAdjustedX = function (x, dir) {
+        if (dir === Grid.Direction.LEFT) return x - 1;
+        if (dir === Grid.Direction.RIGHT) return x + 1;
+        return x;
+    }
+    var getAdjustedY = function (y, dir) {
+        if (dir === Grid.Direction.UP) return y - 1;
+        if (dir === Grid.Direction.DOWN) return y + 1;
+        return y;
+    }
+    var isGameOver = function (x, y, dir) {
+        var nextX = getAdjustedX(x, dir);
+        var nextY = getAdjustedY(y, dir);
+        if (nextX < 0 || nextX >= Grid.Size()) return true;
+        if (nextY < 0 || nextY >= Grid.Size()) return true;
+
+        var hasColision = false;
+        snake.forEach(function (s, idx) {
+            if (idx === 0) return;
+            if (head.pixel.collidesWith(s.pixel)) hasColision = true;
+        });
+        return hasColision;
+    }
+
+    var isIlligalDirection = function (dir, nextDir) {
+        if (dir === Grid.Direction.UP && nextDirection === Grid.Direction.DOWN) return true;
+        if (dir === Grid.Direction.DOWN && nextDirection === Grid.Direction.UP) return true;
+        if (dir === Grid.Direction.LEFT && nextDirection === Grid.Direction.RIGHT) return true;
+        if (dir === Grid.Direction.RIGHT && nextDirection === Grid.Direction.LEFT) return true;
+        return false;
+    }
+
+    var addApple = function () {
+        var x = parseInt(Math.random() * Grid.Size());
+        var y = parseInt(Math.random() * Grid.Size());
+        apple = new Grid.Pixel(x, y, ["apple"]);
+    }
+
+    var gameOver = function () {
+        console.log("Game Over");
+        snake.forEach(function (s) {
+            s.pixel.element.parentNode.removeChild(s.pixel.element);
+        });
+        snake = [];
+    }
+
+    var addToSnake = function () {
+        var idx = snake.length;
+        var x = snake[idx-1].pixel.getx();
+        var y = snake[idx-1].pixel.gety();
+
+        // if tail is not done animating current clock cycle
+        if (snake[idx-1].clock === head.clock - idx) {
+            x = getAdjustedX(x, snake[idx-1].pixel.getDirection());
+            y = getAdjustedY(y, snake[idx-1].pixel.getDirection());
+        }
+        var tmp = new SnakePixel(x, y, head.clock - idx);
+        snake.push(tmp);
+        tmp.pixel.tick = function(e) {
+            tmp.clock++;
+            var dir = directionHistory[head.clock - tmp.clock];
+            e.pixel.setDirection(dir);
+        }
+    }
+
+    var head = new SnakePixel(4, 4, 0);
+    head.pixel.setDirection(Grid.Direction.RIGHT);
+    var apple = null;
+    var nextDirection = Grid.Direction.NONE;
+    var snake = [head];
+    var directionHistory = [];
+    addApple();
+
+    head.pixel.tick = function (e) {
+        head.clock++;
+        var dir = isIlligalDirection(e.direction, nextDirection) ?  e.direction : nextDirection;
+        var x = head.pixel.getx();
+        var y = head.pixel.gety()
+
+        if (isGameOver(x, y, dir)) {
+            return gameOver();
+        };
+
+        directionHistory.unshift(dir);
+        directionHistory = directionHistory.slice(0, snake.length);
+
+        e.pixel.setDirection(dir);
+        if (head.pixel.collidesWith(apple)) {
+            apple.element.parentNode.removeChild(apple.element);
+            addToSnake();
+            addApple();
+        }
+    }
+
+    window.onkeydown = function (e) {
+        var code = e.keyCode ? e.keyCode : e.which;
+        if (code === 37) {
+            nextDirection = Grid.Direction.LEFT;
+        } else if (code === 38) {
+            nextDirection = Grid.Direction.UP;
+        } else if (code === 39) {
+            nextDirection = Grid.Direction.RIGHT;
+        } else if (code === 40) {
+            nextDirection = Grid.Direction.DOWN;
+        } else if (code === 32) { // SPACE
+            nextDirection = Grid.Direction.NONE;
+        }
+    };
+</script>
+</body>
+</html>
