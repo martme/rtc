@@ -130,3 +130,11 @@ var OutputStream = (function (container) {
 var stdin = new InputStream(document.getElementById("stdin"));
 var stdout = new OutputStream(document.getElementById("stdout"));
 var container = document.getElementById("stdout");
+
+var renderMessageReceived = function (username, message) {
+    stdout.matrixRender(username + ": ", message);
+};
+var renderMessageSent = function (username, message) {
+    stdout.println(username + ": " + message);
+};
+

@@ -20,8 +20,7 @@
             <span id="username"></span>
             <input id="stdin"
                 type="text"
-                autofocus="true"
-                onkeypress="return handle_key_press(event)">
+                autofocus="true">
         </div>
     </div>
 <script src="/socket.io/socket.io.js"></script>
@@ -29,54 +28,52 @@
 <script src="/ex1/terminal.js"></script>
 <script src="ex2.js"></script>
 <script>
-
-var sendMessage = function (message) {};
-var handle_key_press = function (e) {
+stdout.loglevel = "info";
+var client = undefined;
+document.querySelector("#stdin").onkeypress = function (e) {
     switch (e.keyCode) {
     case 13: // ENTER
         var input = stdin.read(); stdin.clear();
-        sendMessage(input);
+        window.onEnterPressed(input);
         return;
     case 12: // CTRL+L
         stdout.clear();
         return;
     }
 };
-var renderMessageReceived = function (username, message) {
-    console.log(message);
-    stdout.matrixRender(username + ": ", message);
-};
-var renderMessageSent = function (username, message) {
-    stdout.println(username + ": " + message);
-};
 
-stdout.loglevel = "info";
-var client = new ChatClient();
-
-
-
-client.onpeerconnection = function (peer) {
-    peer.dataChannel.onclose = function (e) {
-        stdout.error("datachannel to " + peer.username + " was closed");
-    };
-    peer.dataChannel.onerror = function (e) {
-        stdout.warn("an error occured on datachannel to peer " + peer.username);
-    };
-    sendMessage = function (message) {
-        var peers = Object.keys(client.peers).forEach(function (key) {
-            var peer = client.peers[key];
-            if (peer.dataChannel && peer.dataChannel.readyState === "open") {
-                peer.dataChannel.send(message);
-            }
-        });
-        renderMessageSent(client.username, message);
-    };
-    peer.dataChannel.onmessage = function (e) {
-        renderMessageReceived(peer.username, e.data);
-    }
+stdout.info("Enter username to start chat client");
+var onEnterPressed = function (message) {
+    var username = message;
+    document.querySelector("#username").textContent = username + "$";
+    stdout.info("Starting client as '" + username + "'");
+    startChatClient(username);
 };
 
-document.querySelector("#username").textContent = client.username + "$";
+// This is where the fun begins
+var startChatClient = (function (username) {
+    client = new ChatClient(username);
+    client.onpeerconnection = function (peer) {
+        peer.dataChannel.onclose = function (e) {
+            stdout.error("datachannel to " + peer.username + " was closed");
+        };
+        peer.dataChannel.onerror = function (e) {
+            stdout.warn("an error occured on datachannel to peer " + peer.username);
+        };
+        window.onEnterPressed = function (message) {
+            var peers = Object.keys(client.peers).forEach(function (key) {
+                var peer = client.peers[key];
+                if (peer.dataChannel && peer.dataChannel.readyState === "open") {
+                    peer.dataChannel.send(message);
+                }
+            });
+            renderMessageSent(client.username, message);
+        };
+        peer.dataChannel.onmessage = function (e) {
+            renderMessageReceived(peer.username, e.data);
+        }
+    };
+});
 </script>
 </body>
 </html>

@@ -127,7 +127,7 @@ var ChatClient = function (username) {
         // Someone else joined the socket.io default room
         // username is the username of the arriving client
         socket.on("hello", function (username) {
-            console.warn("a user with username '" + username + "' joined the room");
+            console.info("a user with username '" + username + "' joined the room");
             connectToPeer(username);
         });
 

@@ -32,7 +32,6 @@
 
 var sendMessage = function (message) {};
 var handle_key_press = function (e) {
-    console.log(e.keyCode)
     switch (e.keyCode) {
     case 13: // ENTER
         var input = stdin.read(); stdin.clear();
@@ -43,14 +42,6 @@ var handle_key_press = function (e) {
         return;
     }
 };
-var renderMessageReceived = function (username, message) {
-    console.log(message);
-    stdout.matrixRender(username + ": ", message);
-};
-var renderMessageSent = function (username, message) {
-    stdout.println(username + ": " + message);
-};
-
 stdout.loglevel = "info";
 var client = new ChatClient();
 
