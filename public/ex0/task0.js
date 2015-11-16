@@ -11,60 +11,44 @@ var servers = {
 
 var alice = {};
 var bob = {};
-var errorFn = function (error) {
-    console.error(error);
-};
-var rtcChannelEstablished = function () {
+
+var celebrateVictory = function () {
     console.log("Connection established");
+    console.log("$$$ Profit! $$$")
 };
 
 alice.peerConnection = new RTCPeerConnection(servers);
 alice.dataChannel = alice.peerConnection.createDataChannel("myDataChannel");
-
 bob.peerConnection = new RTCPeerConnection(servers, {});
 
 alice.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
         var candidate = new RTCIceCandidate(e.candidate);
-        bob.peerConnection.addIceCandidate(e.candidate);
+        // TODO: ???
     }
 }
 bob.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
         var candidate = new RTCIceCandidate(e.candidate);
-        alice.peerConnection.addIceCandidate(e.candidate);
+        // TODO: ???
     }
 }
 
 alice.dataChannel.onopen = function (e) {
-    console.log("Alice's data channel is open", e.target);
-    alice.dataChannel.onmessage = function (e) {
-        console.log("[to:alice]\t", e.data);
-    }
+    // channel = alice.dataChannel
 }
 
 bob.peerConnection.ondatachannel = function (e) {
-    console.log("Bob's data channel is open", e.channel);
     bob.dataChannel = e.channel;
-    bob.dataChannel.onmessage = function (e) {
-        console.log("[to:bob]\t", e.data);
-    }
-    rtcChannelEstablished();
+    // channel = bob.dataChannel
+    celebrateVictory();
 }
 
 alice.peerConnection.createOffer(
     function (offer) {
-        alice.peerConnection.setLocalDescription(offer);
-        bob.peerConnection.setRemoteDescription(offer);
-        bob.peerConnection.createAnswer(
-            function (answer) {
-                bob.peerConnection.setLocalDescription(answer);
-                alice.peerConnection.setRemoteDescription(answer);
-            },
-            errorFn
-        );
+        // TODO: ???
     },
-    errorFn
+    function (error) {}
 );
 
 

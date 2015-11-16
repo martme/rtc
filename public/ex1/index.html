@@ -15,20 +15,21 @@
         </div>
         <div id="in">
             <span class="fa fa-terminal"></span>
+            <span id="username"></span>
             <input id="stdin"
                 type="text"
-                autofocus="true"
-                onkeypress="return handle_key_press(event)">
+                autofocus="true">
         </div>
     </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/common/adapter.js"></script>
 <script src="/common/terminal.js"></script>
-<script src="spoiler1.js"></script>
+<script src="task1.js"></script>
+<!--<script src="spoiler1.js"></script>-->
 <script>
 
 var sendMessage = function (message) {};
-var handle_key_press = function (e) {
+document.querySelector("#stdin").onkeypress = function (e) {
     switch (e.keyCode) {
     case 13: // ENTER
         var input = stdin.read(); stdin.clear();

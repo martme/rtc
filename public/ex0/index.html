@@ -3,10 +3,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <title>example 0</title>
 </head>
-<body>
+<body class="container">
     <script src="/common/adapter.js"></script>
-    <script src="spoiler0.js"></script>
+    <script src="task0.js"></script>
+    <!--<script src="spoiler0.js"></script>-->
+
+    <h2>Oppgave</h2>
+    <ol>
+        <li>Sett opp en <kbd>RTCConnection</kbd> med en <kbd>RTCDataChannel</kbd> mellom Alice og Bob</li>
+        <li>Send <em>"Hello, world!"</em> fra Bob til Alice</li>
+    </ol>
+
+    <h2>Hint</h2>
+    <pre>
+// Create offer / answer
+RTCPeerConnection.prototype.createOffer(
+    function (RTCSessionDescription) {}, // success,
+    function (error) {} // error
+);
+
+// Create answer
+RTCPeerConnection.prototype.createAnswer(
+    function (RTCSessionDescription) {}, // success,
+    function (error) {} // error
+);
+
+// Set local / remote description
+RTCPeerConnection.prototype.setRemoteDescription(RTCSessionDescription);
+RTCPeerConnection.prototype.setLocalDescription(RTCSessionDescription);
+
+// Add ICE Candidate
+RTCPeerConnection.prototype.addIceCandidate(RTCIceCandidate);
+    </pre>
+
+
 </body>
 </html>

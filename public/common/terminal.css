@@ -1,3 +1,4 @@
+
 body {
     margin: 0;
     padding: 0;
@@ -7,6 +8,7 @@ body {
     color: #29ff17;
     font-family: monospace;
     font-size: 1.2em;
+    background: black;
 }
 
 .hidden {
@@ -65,9 +67,11 @@ body {
 
     white-space:nowrap;
     overflow-x: hidden;
+
 }
 
 input, textarea {
+    background-color: black;
 }
 
 #in > input {
@@ -78,7 +82,6 @@ input, textarea {
     background: black;
     border: none;
     width: 100%;
-    /*max-width: calc(100% - 2em);*/
     outline: none;
     padding: 0;
 }
