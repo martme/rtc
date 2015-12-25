@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>webrtc-101</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>webrtc 101</h1>
+        <hr>
+
+        <section id="level0">
+            <h2>
+                WebRTC Connection Establishment
+            </h2>
+            <span class="label label-success">
+                Level 0
+                <span class="fa fa-star-half-o"></span>
+                <span class="fa fa-star-o"></span>
+                <span class="fa fa-star-o"></span>
+            </span>
+            <p>Hvordan sette opp en P2P-forbindelse mellom to klienter som besøker samme nettside samtidig?
+            <ul>
+                <li>Sett opp en <code>RTCConnection</code> med en <code>RTCDataChannel</code> mellom Alice og Bob</li>
+                <li>Send <em>"Hello, world!"</em> fra Bob til Alice</li>
+            </ul>
+
+            Hint:
+            <pre>
+// Create offer / answer
+RTCPeerConnection.prototype.createOffer(
+    function (RTCSessionDescription) {}, // success,
+    function (error) {} // error
+);
+
+// Create answer
+RTCPeerConnection.prototype.createAnswer(
+    function (RTCSessionDescription) {}, // success,
+    function (error) {} // error
+);
+
+// Set local / remote description
+RTCPeerConnection.prototype.setRemoteDescription(RTCSessionDescription);
+RTCPeerConnection.prototype.setLocalDescription(RTCSessionDescription);
+
+// Add ICE Candidate
+RTCPeerConnection.prototype.addIceCandidate(RTCIceCandidate);</pre>
+            </p>
+        </section>
+
+        <section id="level1">
+            <h2>
+                Lag én-til-én-chat
+            </h2>
+            <span class="label label-success">
+                Level 1
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star-o"></span>
+                <span class="fa fa-star-o"></span>
+            </span>
+
+            <p>Sett opp en connection mellom de to besøende av <a href="ex1/index.html">denne siden</a>. Bruk de ferdig-implementerte metodene for å overføre <abbr title="Javascript Session Establishment Protocol" class="initialism">JSEP</abbr>-signaler mellom klientene vha Web Sockets.</p>
+
+            <p>Hint: Du kan se på <a href="ex1/spoiler1.js">denne eksempelløsningen</a> hvis du står fast.</p>
+
+            <p>
+                Ferdig allerede? Hva skjer hvis Carol prøver å bli med i samtalen mellom Bob og Alice? Sjekk ut level 3!
+            </p>
+        </section>
+
+
+        <section id="level2">
+            <h2>
+                Lag mange-til-mange-chat!
+            </h2>
+            <span class="label label-warning">
+                Level 2
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star-o"></span>
+            </span>
+            <p>Hvem trenger Slack når man kan lage sin egen <abbr title="Internet Relay Chat" class="initialism">IRC</abbr> applikasjon med WebRTC?. For å løse denne oppgaven må du bestemme deg for om det er klientens eller serveren sin oppgave å holde styr på hvem som skal motta hvilke meldinger, altså om serveren fungerer som en switch eller en hub.</p>
+
+            <p>Hint: Serveren <code>/server.js</code> trenger ikke å forrandres på om du går for den enkleste varianten. Står du fast kan du ta en sniktitt på <a href="/ex2/spoiler2.js">denne eksempelløsningen</a></p>
+        </section>
+
+        <section id="level3">
+            <h2>
+                Moro med CSS3-animasjoner
+            </h2>
+            <span class="label label-danger">
+                Level 3
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+            </span>
+            <p>
+                Hvorfor ikke lage multiplayer-spill med CSS3-animasjoner? Se på implementasjonen av klassikeren Snake som ligger <a href="/ex3/">her</a> og lag dit eget spill!
+            </p>
+        </section>
+        <section id="level4">
+
+            <h2>
+                Moro med Canvas
+            </h2>
+            <span class="label label-warning">
+                Level 4
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star-half-o"></span>
+            </span>
+            <p>
+                Ikke like kunstnerisk som Bob Ross? Du kan bli om <code>WebRTC && &lt;canvas&gt;</code>.
+                Lag din egen "video stream" hvor det du tegner i et canvas blir tegnet på skjermen til de som ser på, slik som i <a href="/ex4/">dette eksempelet</a>.
+                I stedet for å la det du tegner bli gjengitt i samme bilde, overfør det som tegnes til andre brukere som er koblet til.
+            </p>
+        </section>
+    </div>
+</body>
+</html>
