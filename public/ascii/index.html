@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <style>
+    body {
+        font-size: 100%;
+    }
+    pre {
+        font-size: 50%;
+    }
+    </style>
+</head>
+<body>
+
+<video autoplay width="160" height="120"></video>
+<canvas></canvas>
+<pre id="output"></pre>
+
+<script src="/common/adapter.js"></script>
+<script src="/common/ascii.js"></script>
+<script src="app.js"></script>
+
+<script>
+var pre = document.querySelector("pre");
+app.run({
+    fps: 10,
+    scale: 0.2,
+    callback: function (asciiString) {
+        pre.innerHTML = asciiString;
+    }
+});
+
+</script>
+
+</body>
+</html>
