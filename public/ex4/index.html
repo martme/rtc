@@ -86,7 +86,6 @@ var drawingMonitor = new DrawingMonitor("output");
 var drawingApp = new DrawingApp("input");
 
 drawingApp.ondraw = function(x, y, size, fillStyle) {
-    console.log("foo");
     drawingMonitor.addFrame(x, y, size, fillStyle);
 }
 
