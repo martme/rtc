@@ -1,10 +1,64 @@
 body {
-    margin: 0;
-    padding: 0;
+    padding-top: 1em;
+    font-size: 200%;
+    padding-bottom: 45px;
 }
-main {
-    margin: 0 auto;
+
+#initialize {
+    position: fixed;
+    z-index: 1000;
+    width: calc(100vw -30px);
+    margin-left: -15px;
+    height: 100vh;
+    background: white;
 }
-.apple {
-    background: red;
+
+.jumbotron {
+    padding: 2em;
+}
+
+.pull-down {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    padding: 5px;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+li.contact {
+    background: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 0.5em;
+}
+
+li.current-contact {
+    font-weight: bold;
+}
+
+li.contact:hover {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+li.contact:active {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+li.message {
+    padding: 0.5em;
+    width: 90%;
+    margin-bottom: 0.5em;
+}
+
+.message-sent {
+    margin-left: 10%;
+    background: rgba(100, 150, 255, 0.3);
+}
+
+.message-received {
+    background: rgba(100, 255, 150, 0.3);
 }

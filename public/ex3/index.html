@@ -1,131 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Snake</title>
-    <link rel="stylesheet" href="sprite-grid.css" type="style/css">
-    <link rel="stylesheet" href="style.css" type="style/css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>example 3</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
 </head>
+<body class="container-fluid">
+    <div id="initialize">
+        <div class="col-xs-10 col-xs-pull-1 col-xs-push-1">
+            <div class="jumbotron">
+                <h1>Chat Client</h1>
+                <p>Pick a username to start</p>
+                <div class="input-group">
+                    <input id="usernameInput" type="text" class="form-control" placeholder="Select a username">
+                    <span class="input-group-btn">
+                        <button id="submitUsername" class="btn btn-success" type="button">Go!</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-3">
+        <ul data-bind="foreach: contacts" class="list-unstyled">
+            <li class="contact"
+                data-bind="css: {'current-contact': iscurrent},
+                attr: {'data-index': $index },
+                click: $parent.selectContact">
+                <span data-bind="css: status().labelclass, text: status().displaytext"></span>
+                <span data-bind="text: username"></span>
+                <span class="badge" data-bind="text: unread"></span>
+            </li>
+        </ul>
+    </div>
+    <div class="col-xs-9">
+        <h1 data-bind="text: contact().username"></h1>
+        <ul data-bind="foreach: contact().messages" class="list-unstyled">
+            <li data-bind="css: messagetype, attr: {'data-index': $index }">
+                <p>
+                    <span class="fa fa-commenting-o"></span> <i data-bind="text: sender"></i>
+                </p>
+                <p data-bind="text: text"></p>
+            </li>
+        </ul>
+    </div>
 
-<body>
-    <main id="grid" class="sprite-grid">
-    </main>
+    <div class="row pull-down">
+        <div class="col-xs-9 col-xs-push-3">
+        <div class="input-group">
+            <input id="messageinput" type="text" class="form-control" placeholder="Type here to send a message ...">
+            <span class="input-group-btn">
+                <button class="btn btn-success"
+                    type="button"
+                    data-bind="click: sendMessage">Send</button>
+            </span>
+        </div>
+    </div>
 
-<script src="sprite-grid.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common/adapter.js"></script>
+<script src="ChatClient.js"></script>
+<script src="WebRTCHub.js"></script>
 <script>
-    var Grid = new SpriteGrid(document.getElementById("grid"));
 
-    var SnakePixel = function (x, y, clock) {
-        this.pixel = new Grid.Pixel(x, y, ["sprite-black"]);
-        this.clock = clock || 0;
-    }
-    var getAdjustedX = function (x, dir) {
-        if (dir === Grid.Direction.LEFT) return x - 1;
-        if (dir === Grid.Direction.RIGHT) return x + 1;
-        return x;
-    }
-    var getAdjustedY = function (y, dir) {
-        if (dir === Grid.Direction.UP) return y - 1;
-        if (dir === Grid.Direction.DOWN) return y + 1;
-        return y;
-    }
-    var isGameOver = function (x, y, dir) {
-        var nextX = getAdjustedX(x, dir);
-        var nextY = getAdjustedY(y, dir);
-        if (nextX < 0 || nextX >= Grid.Size()) return true;
-        if (nextY < 0 || nextY >= Grid.Size()) return true;
+document.querySelector("#submitUsername").onclick = function() {
+    document.querySelector("#initialize").classList.add("hidden");
+    var username = document.querySelector("#usernameInput").value;
+    var client = new ChatClient(username);
+    ko.applyBindings(client);
+}
 
-        var hasColision = false;
-        snake.forEach(function (s, idx) {
-            if (idx === 0) return;
-            if (head.pixel.collidesWith(s.pixel)) hasColision = true;
-        });
-        return hasColision;
-    }
-
-    var isIlligalDirection = function (dir, nextDir) {
-        if (dir === Grid.Direction.UP && nextDirection === Grid.Direction.DOWN) return true;
-        if (dir === Grid.Direction.DOWN && nextDirection === Grid.Direction.UP) return true;
-        if (dir === Grid.Direction.LEFT && nextDirection === Grid.Direction.RIGHT) return true;
-        if (dir === Grid.Direction.RIGHT && nextDirection === Grid.Direction.LEFT) return true;
-        return false;
-    }
-
-    var addApple = function () {
-        var x = parseInt(Math.random() * Grid.Size());
-        var y = parseInt(Math.random() * Grid.Size());
-        apple = new Grid.Pixel(x, y, ["apple"]);
-    }
-
-    var gameOver = function () {
-        console.log("Game Over");
-        snake.forEach(function (s) {
-            s.pixel.element.parentNode.removeChild(s.pixel.element);
-        });
-        snake = [];
-    }
-
-    var addToSnake = function () {
-        var idx = snake.length;
-        var x = snake[idx-1].pixel.getx();
-        var y = snake[idx-1].pixel.gety();
-
-        // if tail is not done animating current clock cycle
-        if (snake[idx-1].clock === head.clock - idx) {
-            x = getAdjustedX(x, snake[idx-1].pixel.getDirection());
-            y = getAdjustedY(y, snake[idx-1].pixel.getDirection());
-        }
-        var tmp = new SnakePixel(x, y, head.clock - idx);
-        snake.push(tmp);
-        tmp.pixel.tick = function(e) {
-            tmp.clock++;
-            var dir = directionHistory[head.clock - tmp.clock];
-            e.pixel.setDirection(dir);
-        }
-    }
-
-    var head = new SnakePixel(4, 4, 0);
-    head.pixel.setDirection(Grid.Direction.RIGHT);
-    var apple = null;
-    var nextDirection = Grid.Direction.NONE;
-    var snake = [head];
-    var directionHistory = [];
-    addApple();
-
-    head.pixel.tick = function (e) {
-        head.clock++;
-        var dir = isIlligalDirection(e.direction, nextDirection) ?  e.direction : nextDirection;
-        var x = head.pixel.getx();
-        var y = head.pixel.gety()
-
-        if (isGameOver(x, y, dir)) {
-            return gameOver();
-        };
-
-        directionHistory.unshift(dir);
-        directionHistory = directionHistory.slice(0, snake.length);
-
-        e.pixel.setDirection(dir);
-        if (head.pixel.collidesWith(apple)) {
-            apple.element.parentNode.removeChild(apple.element);
-            addToSnake();
-            addApple();
-        }
-    }
-
-    window.onkeydown = function (e) {
-        var code = e.keyCode ? e.keyCode : e.which;
-        if (code === 37) {
-            nextDirection = Grid.Direction.LEFT;
-        } else if (code === 38) {
-            nextDirection = Grid.Direction.UP;
-        } else if (code === 39) {
-            nextDirection = Grid.Direction.RIGHT;
-        } else if (code === 40) {
-            nextDirection = Grid.Direction.DOWN;
-        } else if (code === 32) { // SPACE
-            nextDirection = Grid.Direction.NONE;
-        }
-    };
 </script>
 </body>
 </html>
