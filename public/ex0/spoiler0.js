@@ -11,11 +11,10 @@ var servers = {
 
 var alice = {};
 var bob = {};
-var errorFn = function (error) {
-    console.error(error);
-};
-var rtcChannelEstablished = function () {
+
+var celebrateVictory = function () {
     console.log("Connection established");
+    console.log("$$$ Profit! $$$")
 };
 
 alice.peerConnection = new RTCPeerConnection(servers);
@@ -26,45 +25,70 @@ bob.peerConnection = new RTCPeerConnection(servers, {});
 alice.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
         var candidate = new RTCIceCandidate(e.candidate);
-        bob.peerConnection.addIceCandidate(e.candidate);
+        // socket.io magic
+        bob.peerConnection.addIceCandidate(candidate);
     }
 }
 bob.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
         var candidate = new RTCIceCandidate(e.candidate);
-        alice.peerConnection.addIceCandidate(e.candidate);
+        // socket.io magic
+        alice.peerConnection.addIceCandidate(candidate);
     }
 }
 
 alice.dataChannel.onopen = function (e) {
-    console.log("Alice's data channel is open", e.target);
-    alice.dataChannel.onmessage = function (e) {
-        console.log("[to:alice]\t", e.data);
-    }
+    // channel = alice.dataChannel
 }
 
 bob.peerConnection.ondatachannel = function (e) {
-    console.log("Bob's data channel is open", e.channel);
     bob.dataChannel = e.channel;
-    bob.dataChannel.onmessage = function (e) {
-        console.log("[to:bob]\t", e.data);
+
+    celebrateVictory();
+
+    bob.dataChannel.onmessage = function (e){
+        console.log(e.data, e);
+        var buffer = e.data;
+        console.log(buffer.byteLength);
     }
-    rtcChannelEstablished();
+
+    console.info("Man kan også sende binær-data!")
+    var data = new Uint8Array([0, 1, 2, 3, 4, 5]);
+    alice.dataChannel.send(data);
 }
 
 alice.peerConnection.createOffer(
     function (offer) {
         alice.peerConnection.setLocalDescription(offer);
+        // litt socketio her ...
         bob.peerConnection.setRemoteDescription(offer);
         bob.peerConnection.createAnswer(
             function (answer) {
                 bob.peerConnection.setLocalDescription(answer);
+                // socketio magic
                 alice.peerConnection.setRemoteDescription(answer);
             },
-            errorFn
+            function (error) {}
         );
+
     },
-    errorFn
+    function (error) {}
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
