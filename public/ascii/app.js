@@ -24,7 +24,6 @@ var app = (function () {
         canvas.setAttribute("width", video.width);
         canvas.setAttribute("height", video.height);
 
-        console.log(video.width)
         context = canvas.getContext("2d");
         startCapture(options);
     }

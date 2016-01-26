@@ -22,6 +22,9 @@ alice.dataChannel = alice.peerConnection.createDataChannel("myDataChannel");
 
 bob.peerConnection = new RTCPeerConnection(servers, {});
 
+
+
+
 alice.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
     }
@@ -35,8 +38,12 @@ alice.dataChannel.onopen = function (e) {
 }
 
 bob.peerConnection.ondatachannel = function (e) {
+    bob.dataChannel = e.channel;
     celebrateVictory();
 }
+
+
+
 
 
 

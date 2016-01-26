@@ -22,58 +22,51 @@ alice.dataChannel = alice.peerConnection.createDataChannel("myDataChannel");
 
 bob.peerConnection = new RTCPeerConnection(servers, {});
 
+alice.peerConnection.createOffer(
+    function (alicesOffer) {
+        alice.peerConnection.setLocalDescription(alicesOffer);
+        // på magisk vis blir denne også sent til Bob!
+        bob.peerConnection.setRemoteDescription(alicesOffer);
+
+        bob.peerConnection.createAnswer(
+            function (bobsAnswer) {
+                bob.peerConnection.setLocalDescription(bobsAnswer);
+                // på magisk vis sendes dette tilbake til Alice!
+                alice.peerConnection.setRemoteDescription(bobsAnswer);
+            },
+            function (error) {
+            })
+    },
+    function (error) {
+
+    });
+
+
+
 alice.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
-        var candidate = new RTCIceCandidate(e.candidate);
-        // socket.io magic
-        bob.peerConnection.addIceCandidate(candidate);
+        bob.peerConnection.addIceCandidate(e.candidate);
     }
 }
 bob.peerConnection.onicecandidate = function (e) {
     if (e.candidate) {
-        var candidate = new RTCIceCandidate(e.candidate);
-        // socket.io magic
-        alice.peerConnection.addIceCandidate(candidate);
+        alice.peerConnection.addIceCandidate(e.candidate);
     }
 }
 
 alice.dataChannel.onopen = function (e) {
-    // channel = alice.dataChannel
+
+    alice.dataChannel.onmessage = function (e) {
+        console.log("alice received message:", e.data);
+    }
 }
 
 bob.peerConnection.ondatachannel = function (e) {
     bob.dataChannel = e.channel;
-
     celebrateVictory();
 
-    bob.dataChannel.onmessage = function (e){
-        console.log(e.data, e);
-        var buffer = e.data;
-        console.log(buffer.byteLength);
-    }
-
-    console.info("Man kan også sende binær-data!")
-    var data = new Uint8Array([0, 1, 2, 3, 4, 5]);
-    alice.dataChannel.send(data);
+    bob.dataChannel.send("Hello, world!");
 }
-
-alice.peerConnection.createOffer(
-    function (offer) {
-        alice.peerConnection.setLocalDescription(offer);
-        // litt socketio her ...
-        bob.peerConnection.setRemoteDescription(offer);
-        bob.peerConnection.createAnswer(
-            function (answer) {
-                bob.peerConnection.setLocalDescription(answer);
-                // socketio magic
-                alice.peerConnection.setRemoteDescription(answer);
-            },
-            function (error) {}
-        );
-
-    },
-    function (error) {}
-);
 
 
 

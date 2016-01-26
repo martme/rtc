@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <style>
+    pre {
+        font-size: 60%;
+        background: none;
+        border: none;
+    }
+    </style>
+</head>
+<body class="container">
+<ul class="nav nav-pills">
+    <li role="presentation"><a href="index.html">Basics</a></li>
+    <li role="presentation" class="active"><a href="ascii.html">Ascii Camera</a></li>
+    <li role="presentation"><a href="hellorealworld.html">Hello, real world</a></li>
+</ul>
+
+<div class="col-xs-12">
+    <h1>Ascii Camera</h1>
+    <video autoplay width="160" height="120"></video>
+    <canvas></canvas>
+    <pre id="output"></pre>
+</div>
+<script src="/common/adapter.js"></script>
+<script src="/common/ascii.js"></script>
+<script src="/ascii/app.js"></script>
+<script src="spoiler.js"></script>
+
+<script>
+celebrateVictory = function () {
+    console.log(bob);
+    alice.dataChannel.onmessage = function (e) {
+        document.querySelector("pre").innerHTML = e.data;
+    }
+    app.run({
+        fps: 10,
+        scale: 0.2,
+        callback: function (asciiString) {
+            bob.dataChannel.send(asciiString)
+        }
+    });
+}
+</script>
+
