@@ -29,11 +29,10 @@
 <script src="/common/adapter.js"></script>
 <script src="/common/ascii.js"></script>
 <script src="/ascii/app.js"></script>
-<script src="spoiler.js"></script>
+<script src="spoiler0.js"></script>
 
 <script>
 celebrateVictory = function () {
-    console.log(bob);
     alice.dataChannel.onmessage = function (e) {
         document.querySelector("pre").innerHTML = e.data;
     }
