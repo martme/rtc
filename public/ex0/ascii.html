@@ -15,15 +15,15 @@
 </head>
 <body class="container">
 <ul class="nav nav-pills">
-    <li role="presentation"><a href="index.html">Basics</a></li>
+    <li role="presentation"><a href="index.html">Hello, world!</a></li>
     <li role="presentation" class="active"><a href="ascii.html">Ascii Camera</a></li>
     <li role="presentation"><a href="hellorealworld.html">Hello, real world</a></li>
 </ul>
 
 <div class="col-xs-12">
     <h1>Ascii Camera</h1>
-    <video autoplay width="160" height="120"></video>
-    <canvas></canvas>
+    <video autoplay width="160" height="120" class="hidden"></video>
+    <canvas class="hidden"></canvas>
     <pre id="output"></pre>
 </div>
 <script src="/common/adapter.js"></script>
@@ -38,7 +38,7 @@ celebrateVictory = function () {
     }
     app.run({
         fps: 10,
-        scale: 0.2,
+        scale: 0.3,
         callback: function (asciiString) {
             bob.dataChannel.send(asciiString)
         }

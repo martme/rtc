@@ -5,6 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <script>
+        function resizeIframe(obj) {
+            obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+        }
+    </script>
+    <style>
+    body {
+        height: 100vh;
+    }
+    iframe {
+        width: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 0.2em;
+    }
+    </style>
 </head>
 <body class="container">
 <ul class="nav nav-pills">
@@ -14,13 +29,23 @@
 </ul>
 <div class="col-xs-12">
     <h1>Hello real world!</h1>
-    <video autoplay width="160" height="120"></video>
-    <canvas></canvas>
-    <pre id="output"></pre>
+    <p>
+        Ting blir ikke lengre sendt på magisk vis fra <a href="realworld/alice.html">Alice</a> til <a href="realworld/bob.html">Bob</a>.
+        Her må WebSockets til!
+    </p>
+
+    <div class="row">
+        <div class="col-xs-6 iframe-wrapper">
+            <h2>Alice</h2>
+            <iframe src="realworld/alice.html" onload="resizeIframe(this)"></iframe>
+        </div>
+        <div class="col-xs-6 iframe-wrapper">
+            <h2>Bob</h2>
+            <iframe src="realworld/bob.html" onload="resizeIframe(this)"></iframe>
+        </div>
+    </div>
 </div>
 <script src="/common/adapter.js"></script>
 
-<script>
 
-</script>
 
