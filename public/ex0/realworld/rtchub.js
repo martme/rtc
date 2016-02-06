@@ -12,17 +12,18 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
     var username = username;
     var onReady = onReady || function () {};
     var onConnectionCallback = onConnectionCallback || function () {};
-    var cache = {};
+
 
     var websocket = io.connect("");
     websocket.on("connect", function () {
+        // fires when websocket connection is ready
         onReady();
     });
     websocket.on("broadcast", function (dto) {
         var message = JSON.parse(dto);
         var source = message._source
-        // ignore messages with other destinations
         if (message._destination !== username) return;
+
         if (message.type == "offer") {
             var offer = new RTCSessionDescription(message);
             handleOffer(source, offer);
@@ -43,56 +44,41 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
     }
 
     var handleOffer = function (from, remoteDescription) {
-        var peerConnection = new RTCPeerConnection(servers);
-        peerConnection.setRemoteDescription(remoteDescription);
-        peerConnection.createAnswer(
-            function (localDescription) {
-                peerConnection.setLocalDescription(localDescription);
-                sendSignal(from, localDescription);
 
-            },
-            function (error) {
-            });
-        peerConnection.onicecandidate = function (e) {
-            if (e.candidate) {
-                sendSignal(from, e.candidate);
-            }
-        }
+        var peerConnection = new RTCPeerConnection(servers);
         peerConnection.ondatachannel = function (e) {
             onConnectionCallback(e.channel);
         }
-        cache[from] = peerConnection;
-
+        /*
+         * TODO:
+         * - Find a local and remote description for the RTCPeerConnection
+         * - Send the answer and IceCandidates using the sendSignal function
+         */
     }
     var handleAnswer = function (from, remoteDescription) {
-        cache[from].setRemoteDescription(remoteDescription);
+        /*
+         * TODO:
+         * - Set the remoteDescription of the correct RTCPeerConnection
+         */
     }
     var handleIceCandidate = function (from, iceCandidate) {
-        cache[from].addIceCandidate(iceCandidate);
+        /*
+         * TODO:
+         * - Add the IceCandidate to the correct RTCPeerConnection
+         */
     }
 
     this.establishConnection = function(destination) {
         var peerConnection = new RTCPeerConnection(servers);
         var dataChannel = peerConnection.createDataChannel("to:" + destination, {});
-
-        peerConnection.createOffer(
-            function (offer) {
-                peerConnection.setLocalDescription(offer);
-                sendSignal(destination, offer);
-            },
-            function (error) {
-                console.error("Something went wrong", error);
-            }
-        );
-        peerConnection.onicecandidate = function (e) {
-            if (e.candidate) {
-                sendSignal(destination, e.candidate);
-            }
-        }
         dataChannel.onopen = function (e) {
             onConnectionCallback(dataChannel);
         }
-        cache[destination] = peerConnection;
+        /*
+         * TODO:
+         * - Create an offer set the local description of the RTCPeerConnection
+         * - Send the offer and IceCandidates using the sendSignal function
+         */
     }
 };
 
