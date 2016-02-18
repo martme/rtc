@@ -19,7 +19,7 @@ var hub = new RTCHub(
     },
     function (dataChannel) {
         dataChannel.onmessage = function (e) {
-            document.querySelector("pre").html += ("\n" + e.data);
+            document.querySelector("pre").innerHTML += ("\n" + e.data);
         }
         dataChannel.send("Hello, world!");
     }
