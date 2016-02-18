@@ -43,6 +43,19 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
         websocket.emit("broadcast", JSON.stringify(obj));
     }
 
+    this.establishConnection = function(destination) {
+        var peerConnection = new RTCPeerConnection(servers);
+        var dataChannel = peerConnection.createDataChannel("to:" + destination, {});
+        dataChannel.onopen = function (e) {
+            onConnectionCallback(dataChannel);
+        }
+        /*
+         * TODO:
+         * - Create an offer set the local description of the RTCPeerConnection
+         * - Send the offer and IceCandidates using the sendSignal function
+         */
+    }
+
     var handleOffer = function (from, remoteDescription) {
 
         var peerConnection = new RTCPeerConnection(servers);
@@ -68,17 +81,5 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
          */
     }
 
-    this.establishConnection = function(destination) {
-        var peerConnection = new RTCPeerConnection(servers);
-        var dataChannel = peerConnection.createDataChannel("to:" + destination, {});
-        dataChannel.onopen = function (e) {
-            onConnectionCallback(dataChannel);
-        }
-        /*
-         * TODO:
-         * - Create an offer set the local description of the RTCPeerConnection
-         * - Send the offer and IceCandidates using the sendSignal function
-         */
-    }
 };
 

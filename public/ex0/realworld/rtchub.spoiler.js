@@ -42,6 +42,30 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
         websocket.emit("broadcast", JSON.stringify(obj));
     }
 
+    this.establishConnection = function(destination) {
+        var peerConnection = new RTCPeerConnection(servers);
+        var dataChannel = peerConnection.createDataChannel("to:" + destination, {});
+
+        peerConnection.createOffer(
+            function (offer) {
+                peerConnection.setLocalDescription(offer);
+                sendSignal(destination, offer);
+            },
+            function (error) {
+                console.error("Something went wrong", error);
+            }
+        );
+        peerConnection.onicecandidate = function (e) {
+            if (e.candidate) {
+                sendSignal(destination, e.candidate);
+            }
+        }
+        dataChannel.onopen = function (e) {
+            onConnectionCallback(dataChannel);
+        }
+        cache[destination] = peerConnection;
+    }
+
     var handleOffer = function (from, remoteDescription) {
         var peerConnection = new RTCPeerConnection(servers);
         peerConnection.setRemoteDescription(remoteDescription);
@@ -69,30 +93,6 @@ var RTCHub = function (username, onReady, onConnectionCallback) {
     }
     var handleIceCandidate = function (from, iceCandidate) {
         cache[from].addIceCandidate(iceCandidate);
-    }
-
-    this.establishConnection = function(destination) {
-        var peerConnection = new RTCPeerConnection(servers);
-        var dataChannel = peerConnection.createDataChannel("to:" + destination, {});
-
-        peerConnection.createOffer(
-            function (offer) {
-                peerConnection.setLocalDescription(offer);
-                sendSignal(destination, offer);
-            },
-            function (error) {
-                console.error("Something went wrong", error);
-            }
-        );
-        peerConnection.onicecandidate = function (e) {
-            if (e.candidate) {
-                sendSignal(destination, e.candidate);
-            }
-        }
-        dataChannel.onopen = function (e) {
-            onConnectionCallback(dataChannel);
-        }
-        cache[destination] = peerConnection;
     }
 };
 
