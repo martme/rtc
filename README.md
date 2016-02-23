@@ -1,4 +1,4 @@
-# Eksempler
+# WebRTC 101
 
 ## Setup
 Default port er 80 i `server.js`; bytt denne til 8080 el. hvis du ikke vil kjøre med `sudo`.
